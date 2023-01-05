@@ -14,74 +14,33 @@ use GuzzleHttp\Client;
  */
 class FortniteApi
 {
-    /**
-     * Undocumented variable
-     *
-     * @var string|null
-     */
-    private $apiKey;
+    private Client $client;
+    public CosmeticsEndpoint $cosmetics;
+    public ShopEndpoint $shop;
+    public NewsEndpoint $news;
+    public CreatorCodeEndpoint $creatorCode;
 
-    /**
-     * Undocumented variable
-     *
-     * @var Client
-     */
-    private $httpClient;
-
-    /**
-     * @inheritDoc
-     *
-     * @var CosmeticsEndpoint $cosmetics
-     */
-    public $cosmetics;
-    /**
-     * @inheritDoc
-     *
-     * @var ShopEndpoint $shop
-     */
-    public $shop;
-    /**
-     * @inheritDoc
-     *
-     * @var NewsEndpoint $news
-     */
-    public $news;
-
-    /**
-     * @inheritDoc
-     *
-     * @var CreatorCodeEndpoint $creatorCode
-     */
-    public $creatorCode;
-
-    /**
-     * Constructs a new FortniteApi instance.
-     */
-    public function __construct($apiKey)
+    public function __construct(
+        private readonly ?string $apiKey = '',
+    )
     {
-        if ($apiKey === null || $apiKey === false) {
-            $apiKey = "";
-        }
-
-        $this->httpClient = new Client([
-            "base_uri" => self::getBaseUri(),
-            "allow_redirects" => true,
-            "connect_timeout" => 30,
-            "timeout" => 30,
-            "headers" => [
-                "x-api-key" => $apiKey
-            ]
+        $this->client = new Client([
+            'base_uri' => self::getBaseUri(),
+            'allow_redirects' => true,
+            'connect_timeout' => 30,
+            'timeout' => 30,
+            'headers' => [
+                'x-api-key' => $this->apiKey
+            ],
         ]);
 
-        $this->apiKey = $apiKey;
-
-        $this->cosmetics = new CosmeticsEndpoint($this->httpClient);
-        $this->shop = new ShopEndpoint($this->httpClient);
-        $this->news = new NewsEndpoint($this->httpClient);
-        $this->creatorCode = new CreatorCodeEndpoint($this->httpClient);
+        $this->cosmetics = new CosmeticsEndpoint($this->client);
+        $this->shop = new ShopEndpoint($this->client);
+        $this->news = new NewsEndpoint($this->client);
+        $this->creatorCode = new CreatorCodeEndpoint($this->client);
     }
 
-    public function getApiKey()
+    public function getApiKey(): ?string
     {
         return $this->apiKey;
     }
@@ -91,17 +50,15 @@ class FortniteApi
      *
      * @return string
      */
-    public static function getBaseUri()
+    public static function getBaseUri(): string
     {
         return "https://fortnite-api.com";
     }
 
     /**
      * Returns all supported languages that can be used with this api.
-     *
-     * @return string[]|array
      */
-    public static function getSupportedLanguages()
+    public static function getSupportedLanguages(): array
     {
         return [
             "ar",
